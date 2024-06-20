@@ -3,6 +3,8 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserEntity } from './user.entity';
 import { Model } from 'mongoose';
+import { LoginDto } from './dto/login.dto';
+import { compare } from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -19,6 +21,24 @@ export class UserService {
     return createdUser.save()
   }
 
+  async loginUser(loginDto: LoginDto): Promise<UserEntity> {
+    const user = await this.userModel.findOne({email: loginDto.email}).select('+password')
 
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.UNPROCESSABLE_ENTITY)
+    }
+
+    const isPasswordCorrect = await compare(loginDto.password, user.password)
+
+    if (!isPasswordCorrect) {
+      throw new HttpException('Incorrect password', HttpStatus.UNPROCESSABLE_ENTITY)
+    }
+
+    return user
+  }
+
+  async findByEmail(email: string): Promise<UserEntity> {
+    return this.userModel.findOne({ email })
+  }
  
 }
