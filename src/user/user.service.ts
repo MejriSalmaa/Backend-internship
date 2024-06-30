@@ -5,12 +5,15 @@ import { UserEntity } from './user.entity';
 import { Model } from 'mongoose';
 import { LoginDto } from './dto/login.dto';
 import { compare } from 'bcrypt';
-import { sign } from 'jsonwebtoken';
+import { JwtService } from '@nestjs/jwt';
 import { UserResponseType } from './types/userResponse.type';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(UserEntity.name) private userModel: Model<UserEntity>) {}
+  constructor(
+    @InjectModel(UserEntity.name) private userModel: Model<UserEntity>,
+    private readonly jwtService: JwtService
+  ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     const user = await this.userModel.findOne({ email: createUserDto.email }).lean();
@@ -23,7 +26,7 @@ export class UserService {
     return createdUser.save();
   }
 
-  async loginUser(loginDto: LoginDto): Promise<UserEntity> {
+  async loginUser(loginDto: LoginDto, response: any): Promise<any> {
     const user = await this.userModel.findOne({ email: loginDto.email }).select('+password').lean();
 
     if (!user) {
@@ -36,9 +39,17 @@ export class UserService {
       throw new HttpException('Incorrect password', HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    return user;
+    const jwt = await this.jwtService.signAsync({ id: user.id });
+
+    response.cookie('jwt', jwt, { httpOnly: true });
+
+    return {
+      message: 'success',
+      user
+    };
   }
 
-
-
+  async findUserById(id: number): Promise<UserEntity | undefined> {
+    return await this.userModel.findOne({ where: { id } });
+  }
 }
