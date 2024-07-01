@@ -5,6 +5,8 @@ import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Response, Request } from 'express';
 import { HttpStatus } from '@nestjs/common';
+import { ObjectId } from 'mongodb'; // Import ObjectId from MongoDB driver
+
 @Controller()
 export class UserController {
   constructor(
@@ -24,11 +26,14 @@ export class UserController {
     if (!user) {
       return response.status(HttpStatus.UNAUTHORIZED).send('Invalid credentials');
     }
-  
+  console.log('user', user);
     // Step 2: Generate JWT token
-    const payload = { username: user.username, sub: user.id }; // Customize payload as needed
-    const token = this.jwtService.sign(payload);
-  
+    const payload = { sub: user.user._id, username: user.user.username };
+    console.log('payload', payload);
+    // Customize payload as needed
+    const token = await this.jwtService.signAsync(payload);
+    console.log('Generated token:', token);
+
     // Step 3: Set the JWT token in the cookies
     response.cookie('jwt', token, { httpOnly: true });
   
@@ -37,27 +42,35 @@ export class UserController {
       message: 'success'
     };
   }
-  
   @Get('user')
   async user(@Req() request: Request): Promise<any> {
     try {
+      console.log('Cookies:', request.cookies); // Log cookies for debugging
       const cookie = request.cookies['jwt'];
-      const data = await this.jwtService.verifyAsync(cookie);
   
-      if (!data) {
-        throw new UnauthorizedException();
+      // Runtime check to ensure cookie is a string
+      if (typeof cookie !== 'string' || !cookie) {
+        console.error('JWT cookie is missing or not a string');
+        throw new UnauthorizedException('JWT cookie is missing or not a string');
       }
   
-      // Assuming your userService has a method to find a user by ID
-      const user = await this.userService.findUserById(data.sub); // Adjust method name and parameter as necessary
+      const data = await this.jwtService.verifyAsync(cookie as string); 
+      console.log("data",data);// Type assertion, useful if verifyAsync strictly requires a string
+      if (!data) {
+        console.error('JWT verification failed');
+        throw new UnauthorizedException('JWT verification failed');
+      }
   
+      const user = await this.userService.findUserById(data.sub);
       if (!user) {
-        throw new UnauthorizedException();
+        console.error('User not found', data.sub);
+        throw new UnauthorizedException('User not found');
       }
   
       const { password, ...result } = user;
       return result;
     } catch (e) {
+      console.error('Error in user method:', e);
       throw new UnauthorizedException();
     }
   }

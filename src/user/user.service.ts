@@ -7,6 +7,7 @@ import { LoginDto } from './dto/login.dto';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserResponseType } from './types/userResponse.type';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UserService {
@@ -49,7 +50,15 @@ export class UserService {
     };
   }
 
-  async findUserById(id: number): Promise<UserEntity | undefined> {
-    return await this.userModel.findOne({ where: { id } });
-  }
+  async findUserById(id: string): Promise<UserEntity | undefined> {
+    const objectId = new ObjectId(id);
+    // Query the database with the ObjectId
+    return await this.userModel.findOne({ _id: objectId }).exec();  
+
+}
+//another way to get the current user
+
+//async findUserById(id: string): Promise<UserEntity | undefined> {
+ /// return await this.userModel.findById(id);
+//}
 }

@@ -4,7 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { UserEntity, UserEntitySchema } from './user.entity';
-import { JwtModule } from "@nestjs/jwt";
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { JwtModule } from "@nestjs/jwt";
     ]),
     JwtModule.register({
       secret: 'secret',
-      signOptions: { expiresIn: '1d' }
+      signOptions: {expiresIn: '1d'}
   })
   ],
   controllers: [UserController],

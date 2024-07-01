@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { hash } from 'bcrypt';
 
-// Define the Role enumeration
 enum Role {
   Admin = 'admin',
   User = 'user',
