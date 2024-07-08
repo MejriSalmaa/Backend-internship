@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUser.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,7 +7,6 @@ import { Model } from 'mongoose';
 import { LoginDto } from './dto/login.dto';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { UserResponseType } from './types/userResponse.type';
 import { ObjectId } from 'mongodb';
 
 @Injectable()
@@ -17,9 +17,8 @@ export class UserService {
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
-    const user = await this.userModel.findOne({ email: createUserDto.email }).lean();
-
-    if (user) {
+    const existingUser = await this.userModel.findOne({ email: createUserDto.email }).lean();
+    if (existingUser) {
       throw new HttpException('Email is already taken', HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
@@ -27,22 +26,16 @@ export class UserService {
     return createdUser.save();
   }
 
-  async loginUser(loginDto: LoginDto, response: any): Promise<any> {
+  async loginUser(loginDto: LoginDto): Promise<any> {
     const user = await this.userModel.findOne({ email: loginDto.email }).select('+password').lean();
-
     if (!user) {
       throw new HttpException('User not found', HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     const isPasswordCorrect = await compare(loginDto.password, user.password);
-
     if (!isPasswordCorrect) {
       throw new HttpException('Incorrect password', HttpStatus.UNPROCESSABLE_ENTITY);
     }
-
-    const jwt = await this.jwtService.signAsync({ id: user.id });
-
-    response.cookie('jwt', jwt, { httpOnly: true });
 
     return {
       message: 'success',
@@ -50,15 +43,17 @@ export class UserService {
     };
   }
 
+  async generateJwt(user: any): Promise<string> {
+    const payload = { sub: user._id, username: user.username };
+    return this.jwtService.signAsync(payload);
+  }
+
+  async verifyJwt(cookie: string): Promise<any> {
+    return await this.jwtService.verifyAsync(cookie);
+  }
+
   async findUserById(id: string): Promise<UserEntity | undefined> {
     const objectId = new ObjectId(id);
-    // Query the database with the ObjectId
-    return await this.userModel.findOne({ _id: objectId }).exec();  
-
-}
-//another way to get the current user
-
-//async findUserById(id: string): Promise<UserEntity | undefined> {
- /// return await this.userModel.findById(id);
-//}
+    return await this.userModel.findOne({ _id: objectId }).exec();
+  }
 }

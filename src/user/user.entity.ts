@@ -1,11 +1,10 @@
+/* eslint-disable prettier/prettier */
+
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { hash } from 'bcrypt';
+import { Role } from './role.enum'; // Adjust the import path as needed
 
-enum Role {
-  Admin = 'admin',
-  User = 'user',
-}
 
 @Schema()
 export class UserEntity extends Document {
