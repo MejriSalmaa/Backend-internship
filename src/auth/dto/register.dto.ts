@@ -7,7 +7,7 @@ enum Role {
   User = 'user',
 }
 
-export class CreateUserDto {
+export class RegisterDto  {
   @IsNotEmpty()
   readonly username: string;
 

@@ -1,25 +1,20 @@
 /* eslint-disable prettier/prettier */
 
-// src/users/users.module.ts
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserService } from './user.service';
-import { UserController } from './user.controller';
-import { UserEntity, UserEntitySchema } from './user.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { UserService } from './user.service';
+import { UserEntity, UserEntitySchema } from './user.entity';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      { name: UserEntity.name, schema: UserEntitySchema },
-    ]),
+    MongooseModule.forFeature([{ name: UserEntity.name, schema: UserEntitySchema }]),
     JwtModule.register({
-      secret: 'secret',
-      signOptions: {expiresIn: '1d'}
-  })
+      secret: process.env.JWT_SECRET || 'secretKey', // Add your secret key here
+      signOptions: { expiresIn: '1h' },
+    }),
   ],
-  controllers: [UserController],
   providers: [UserService],
-  exports: [UserService],
+  exports: [UserService, MongooseModule],
 })
 export class UserModule {}
