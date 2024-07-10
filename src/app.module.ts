@@ -7,13 +7,12 @@ import { UserModule } from './user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { EventModule } from './event/event.module'; // Only import the module
 import { AuthModule } from './auth/auth.module';
-
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://127.0.0.1:27017/internship'),
-    JwtModule.register({
-      secret: 'secret',
-      signOptions: { expiresIn: '1d' }
+    ConfigModule.forRoot({
+      isGlobal: true, // Makes ConfigModule global
     }),
     UserModule,
     EventModule,

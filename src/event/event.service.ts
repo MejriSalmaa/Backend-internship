@@ -12,7 +12,9 @@ export class EventService {
     @InjectModel(EventEntity.name) private   eventModel: Model<EventEntity>,
   ) {}
 
-  async createEvent(eventData: CreateEventDto): Promise<EventEntity> {
+
+  async createEvent(eventData: CreateEventDto, creatorEmail: string): Promise<EventEntity> {
+    eventData.creator = creatorEmail; // Set the creator's email
     const createdEvent = new this.eventModel(eventData);
     return createdEvent.save();
   }

@@ -8,7 +8,6 @@ import { EventEntity, EventEntitySchema } from './event.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module'; // Import UserModule
 import { UserEntity, UserEntitySchema } from '../user/user.entity';
-
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -17,7 +16,8 @@ import { UserEntity, UserEntitySchema } from '../user/user.entity';
 
     ]),
     JwtModule.register({
-      secret: 'secret', // Ensure to use a secure, environment-specific way to handle the secret in production
+      secret: process.env.JWT_SECRET,
+      // Ensure to use a secure, environment-specific way to handle the secret in production
       signOptions: { expiresIn: '1d' }
     }),UserModule,
   ],

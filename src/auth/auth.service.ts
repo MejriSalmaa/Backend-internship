@@ -1,20 +1,18 @@
 /* eslint-disable prettier/prettier */
-
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus , UseGuards, Get ,Request} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { UserService } from '../user/user.service';
 import { RegisterDto } from './dto/register.dto';
-import {LoginDto} from './dto/login.dto';
+import { LoginDto } from './dto/login.dto';
 import { compare } from 'bcrypt';
 import { UserEntity } from '../user/user.entity';
-
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(UserEntity.name) private userModel: Model<UserEntity>,
-   
     private readonly userService: UserService,
     private readonly jwtService: JwtService
   ) {}
@@ -29,7 +27,7 @@ export class AuthService {
     return createdUser.save();
   }
 
-  async loginUser(loginDto: LoginDto): Promise<any> {
+  async loginUser(loginDto: LoginDto) {
     const user = await this.userModel.findOne({ email: loginDto.email }).select('+password').lean();
     if (!user) {
       throw new HttpException('User not found', HttpStatus.UNPROCESSABLE_ENTITY);
@@ -40,19 +38,22 @@ export class AuthService {
       throw new HttpException('Incorrect password', HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    const payload = { sub: user._id, username: user.username, email: user.email };
+    const token = this.jwtService.sign(payload);
+
     return {
       message: 'success',
-      user
+      user,
+      token
     };
   }
 
-  async generateJwt(user: any): Promise<string> {
-    const payload = { sub: user._id, username: user.username };
-    return this.jwtService.signAsync(payload);
+  async verifyJwt(token: string): Promise<any> {
+    try {
+      return this.jwtService.verifyAsync(token);
+    } catch (err) {
+      throw new HttpException('Token has expired', HttpStatus.UNAUTHORIZED);
+    }
   }
-
-  async verifyJwt(cookie: string): Promise<any> {
-    return await this.jwtService.verifyAsync(cookie);
-  }
- 
+  
 }

@@ -1,11 +1,11 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, Post, Body, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Request ,UseGuards , Get} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { UserEntity } from '../user/user.entity';
-
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -26,6 +26,16 @@ export class AuthController {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
     }
+  }
+  @UseGuards(JwtAuthGuard)
+  @Post('protected')
+  async protectedRoute(@Request() req) {
+    return { message: 'You have access to this protected route', user: req.user };
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
   }
   
 }

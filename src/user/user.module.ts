@@ -10,8 +10,8 @@ import { UserEntity, UserEntitySchema } from './user.entity';
   imports: [
     MongooseModule.forFeature([{ name: UserEntity.name, schema: UserEntitySchema }]),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'secretKey', // Add your secret key here
-      signOptions: { expiresIn: '1h' },
+      secret: process.env.JWT_SECRET , // Add your secret key here
+      signOptions: { expiresIn: '1d' },
     }),
   ],
   providers: [UserService],
