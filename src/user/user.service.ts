@@ -26,7 +26,7 @@ export class UserService {
       throw new HttpException('Incorrect password', HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    const payload = { sub: user._id, username: user.username, email: user.email };
+    const payload = { _id: user._id,  email: user.email };
     const token = await this.jwtService.signAsync(payload);
 
     return { token };

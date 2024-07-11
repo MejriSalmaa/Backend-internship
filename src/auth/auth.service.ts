@@ -38,11 +38,10 @@ export class AuthService {
       throw new HttpException('Incorrect password', HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    const payload = { sub: user._id, username: user.username, email: user.email };
+    const payload = { email: user.email, sub: user._id };
     const token = this.jwtService.sign(payload);
 
     return {
-      message: 'success',
       user,
       token
     };

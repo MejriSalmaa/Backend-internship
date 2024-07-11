@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, Post, Body, Request,UseGuards ,Patch,Param,NotFoundException} from '@nestjs/common';
+import { Controller, Post, Body, Request,UseGuards ,Patch,Param,NotFoundException,Delete} from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/createEvent.dto';
 import { UserService } from '../user/user.service';
@@ -38,5 +38,14 @@ async create(@Body() createEventDto: CreateEventDto , @Request() req ) {
       throw new NotFoundException('Event not found');
     }
     return event;
+  }
+  
+  @Delete('/delete/:id')
+  @UseGuards(JwtAuthGuard)
+  async remove(@Param('id') id: string, @Request() req): Promise<{ deleted: boolean }> {
+    const userEmail = req.user.email;
+    
+
+    return this.eventService.remove(id, userEmail);
   }
 }

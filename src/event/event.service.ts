@@ -1,11 +1,13 @@
 /* eslint-disable prettier/prettier */
 
-import { Injectable ,NotFoundException} from '@nestjs/common';
+import { Injectable ,NotFoundException,UnauthorizedException} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EventEntity } from './event.entity';
 import { CreateEventDto } from './dto/createEvent.dto';
 import { UpdateEventDto } from './dto/updateEvent.dto';
+import { ObjectId } from 'mongodb';
+
 @Injectable()
 export class EventService {
   constructor(
@@ -25,5 +27,31 @@ export class EventService {
       throw new NotFoundException('Event not found');
     }
     return updatedEvent;
+  }
+
+  async remove(eventId: string, userEmail: string): Promise<{ deleted: boolean }> {
+    const event = await this.findByIdEvent(eventId);
+  
+    if (!event) {
+      throw new NotFoundException('Event not found delete');
+    }
+    
+   
+    // Check if event.creator and userEmail are defined
+    if (!event.creator || !userEmail) {
+      throw new Error('Missing creator or user email');
+    }
+  
+    if (event.creator !== userEmail) {
+      throw new UnauthorizedException('You do not have permission to delete this event');
+    }
+  
+    await this.eventModel.deleteOne({ _id: eventId });
+    return { deleted: true };
+  }
+  async findByIdEvent(id: string): Promise<EventEntity | undefined> {
+    const objectId = new ObjectId(id);
+    return await this.eventModel.findOne({ _id: objectId }).exec();
+    
   }
 }
