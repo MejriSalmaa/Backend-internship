@@ -54,4 +54,8 @@ export class EventService {
     return await this.eventModel.findOne({ _id: objectId }).exec();
     
   }
+
+  async findAll(): Promise<EventEntity[]> {
+    return this.eventModel.find().exec();
+  }
 }

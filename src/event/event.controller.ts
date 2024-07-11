@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, Post, Body, Request,UseGuards ,Patch,Param,NotFoundException,Delete} from '@nestjs/common';
+import { Controller, Post, Body, Request,UseGuards ,Patch,Param,NotFoundException,Delete, Get} from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/createEvent.dto';
 import { UserService } from '../user/user.service';
@@ -47,5 +47,10 @@ async create(@Body() createEventDto: CreateEventDto , @Request() req ) {
     
 
     return this.eventService.remove(id, userEmail);
+  }
+
+  @Get()
+  async findAll(): Promise<EventEntity[]> {
+    return this.eventService.findAll();
   }
 }
