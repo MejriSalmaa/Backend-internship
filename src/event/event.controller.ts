@@ -50,6 +50,7 @@ async create(@Body() createEventDto: CreateEventDto , @Request() req ) {
   }
 
   @Get()
+  @UseGuards(JwtAuthGuard)
   async findAll(): Promise<EventEntity[]> {
     return this.eventService.findAll();
   }

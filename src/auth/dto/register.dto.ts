@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 
 import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsUrl } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger'; // Ensure this is installed
 
 enum Role {
   Admin = 'admin',
@@ -17,10 +18,11 @@ export class RegisterDto  {
 
   @IsNotEmpty()
   readonly password: string;
-
   @IsOptional()
-  @IsUrl()
-  readonly picture?: string;
+  // @IsUrl() // Remove this if you're accepting file uploads
+  @ApiProperty({ type: 'string', format: 'binary' }) // Swagger decorator for file upload
+   picture?: any; // Use Express.Multer.File if using Multer, or any if the type is not yet defined
+
 
   @IsBoolean()
   readonly etat: boolean = false;

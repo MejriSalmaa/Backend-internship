@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { Injectable, HttpException, HttpStatus , UseGuards, Get ,Request} from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus , UseGuards, Get ,Request,Post,Res} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
@@ -9,6 +9,9 @@ import { LoginDto } from './dto/login.dto';
 import { compare } from 'bcrypt';
 import { UserEntity } from '../user/user.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import * as fs from 'fs';
+import * as path from 'path';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -23,9 +26,35 @@ export class AuthService {
       throw new HttpException('Email is already taken', HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
+    // Handle file upload if picture is provided
+    if (registerDto.picture) {
+      const file = registerDto.picture;
+
+      // Example path to store uploads
+      const uploadPath = path.join(__dirname, '..', 'uploads');
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath);
+      }
+
+      const fileName = `${Date.now()}-${file.originalname}`;
+      const filePath = path.join(uploadPath, fileName);
+
+      if (file.buffer) {
+        fs.writeFileSync(filePath, file.buffer);
+        registerDto.picture = `/uploads/${fileName}`; // Adjust this URL as per your setup
+      } else {
+        throw new HttpException('File buffer is not defined', HttpStatus.BAD_REQUEST);
+      }
+    }
+    
+
     const createdUser = new this.userModel(registerDto);
     return createdUser.save();
+  }catch (error) {
+    console.error('Error in AuthService.register:', error);
+    throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
   }
+
 
   async loginUser(loginDto: LoginDto) {
     const user = await this.userModel.findOne({ email: loginDto.email }).select('+password').lean();
@@ -42,8 +71,8 @@ export class AuthService {
     const token = this.jwtService.sign(payload);
 
     return {
-      user,
-      token
+      
+      access_token: token
     };
   }
 
@@ -55,4 +84,5 @@ export class AuthService {
     }
   }
   
+
 }
