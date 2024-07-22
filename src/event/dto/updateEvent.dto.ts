@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { IsString, IsOptional, IsEnum, IsDate, IsArray, IsEmail } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsDate, IsArray, IsEmail ,IsDateString} from 'class-validator';
 import { Type } from 'class-transformer';
 import { EventCategory } from './createEvent.dto';
 
@@ -21,15 +21,11 @@ export class UpdateEventDto {
   @IsString()
   location?: string;
 
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  startDate?: Date;
+  @IsDateString()
+  startDate: Date; // ISO 8601 format
 
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  endDate?: Date;
+  @IsDateString()
+  endDate: Date; // ISO 8601 format
 
   @IsOptional()
   @IsEmail()

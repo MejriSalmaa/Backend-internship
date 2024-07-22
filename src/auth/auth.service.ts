@@ -31,7 +31,7 @@ export class AuthService {
       const file = registerDto.picture;
 
       // Example path to store uploads
-      const uploadPath = path.join(__dirname, '..', 'uploads');
+      const uploadPath = path.join(__dirname, '/uploads');
       if (!fs.existsSync(uploadPath)) {
         fs.mkdirSync(uploadPath);
       }
@@ -46,7 +46,6 @@ export class AuthService {
         throw new HttpException('File buffer is not defined', HttpStatus.BAD_REQUEST);
       }
     }
-    
 
     const createdUser = new this.userModel(registerDto);
     return createdUser.save();
@@ -84,5 +83,22 @@ export class AuthService {
     }
   }
   
+  async getProfile(userId: string): Promise<any> {
+    try {
+      const user = await this.userModel.findById(userId).select('email username picture role').lean();
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+      return {
+        email: user.email,
+        username: user.username,
+        picture: user.picture || null, // Return picture URL if available
+        role: user.role
+      };
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
 }

@@ -49,11 +49,11 @@ export class AuthController {
   }
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
+  async getProfile(@Request() req) {
+    const userId = req.user.sub; // Assuming `sub` is the user ID in the JWT payload
+    return this.authService.getProfile(userId);
   }
   @UseGuards(JwtAuthGuard)
-
   @Post('logout')
   async logout(@Res({passthrough: true}) response: Response) {
 

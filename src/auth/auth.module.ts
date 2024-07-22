@@ -8,12 +8,15 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from '../user/user.module';
 import { UserService } from '../user/user.service'; // Import UserService
 import { ConfigService } from '@nestjs/config';
+import { MulterModule } from '@nestjs/platform-express';
+
 @Module({
   imports: [
     ConfigModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
+
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'), // Correctly access the JWT_SECRET
         signOptions: { expiresIn: '1d' },
@@ -21,6 +24,8 @@ import { ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
     UserModule, // Import UserModule to ensure UserService is available
+    MulterModule.register({ dest: './uploads' }), // Configure file storage location
+
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, UserService],

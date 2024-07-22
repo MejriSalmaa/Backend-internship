@@ -2,16 +2,7 @@
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-
-enum EventCategory {
-  Anniversaire = 'Anniversaire',
-  Teambuilding = 'Teambuilding',
-  Social = 'Événement social',
-  Sportif = 'Événement sportif',
-  Seminaire = 'Séminaire',
-  Formation = 'Formation',
-}
-
+import { EventCategory } from './EventCategory.enum';
 @Schema()
 export class EventEntity extends Document {
   @Prop({ required: true })

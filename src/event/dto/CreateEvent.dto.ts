@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { IsString, IsNotEmpty, IsEnum, IsDate, IsArray, IsEmail } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum, IsDate, IsArray, IsEmail,IsDateString } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum EventCategory {
@@ -29,15 +29,12 @@ export class CreateEventDto {
   @IsNotEmpty()
   location: string;
 
-  @IsDate()
-  @Type(() => Date)
-  @IsNotEmpty()
-  startDate: Date;
+  @IsDateString()
+  startDate: string; // ISO 8601 format
 
-  @IsDate()
-  @Type(() => Date)
-  @IsNotEmpty()
-  endDate: Date;
+  @IsDateString()
+  endDate: string; // ISO 8601 format
+
 
   @IsEmail()
   @IsNotEmpty()

@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
+    
     MongooseModule.forRoot('mongodb://127.0.0.1:27017/internship'),
     ConfigModule.forRoot({
       isGlobal: true, // Makes ConfigModule global

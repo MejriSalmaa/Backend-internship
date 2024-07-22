@@ -17,7 +17,7 @@ export class UserEntity extends Document {
   @Prop({ required: true, select: false })
   password: string;
 
-  @Prop()
+  @Prop({ default: null })
   picture: string;
 
   // Add the etat attribute with a default value of false
