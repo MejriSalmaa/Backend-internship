@@ -1,28 +1,42 @@
-/* eslint-disable prettier/prettier */
-
-import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Param, Query, BadRequestException, NotFoundException } from '@nestjs/common';
 import { UserService } from './user.service';
+import { Types } from 'mongoose';
 import { UserEntity } from './user.entity';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('test')
+  testRoute() {
+    return 'Test route working';
+  }
+
   @Get(':id')
   async getUserById(@Param('id') id: string): Promise<UserEntity> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('Invalid ID format');
+    }
     const user = await this.userService.findUserById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     return user;
   }
+  @Get('emails/:search')
+  async getEmailsByParam(@Param('search') search: string) {
+    console.log('Search parameter received:', search); // Log the search parameter
 
-  @Get('email/:email')
-  async getUserByEmail(@Param('email') email: string): Promise<UserEntity> {
-    const user = await this.userService.findUserByEmail(email);
-    if (!user) {
-      throw new NotFoundException(`User with email ${email} not found`);
+    if (!search) {
+      throw new BadRequestException('Search parameter is required');
     }
-    return user;
+
+    try {
+      const emails = await this.userService.findEmails(search);
+      return emails;
+    } catch (error) {
+      console.error('Error in getEmailsByParam:', error);
+      throw new BadRequestException('Failed to fetch emails');
+    }
   }
 }

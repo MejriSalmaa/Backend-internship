@@ -5,19 +5,21 @@ import { EventEntity } from './event.entity';
 import { CreateEventDto } from './dto/createEvent.dto';
 import { UpdateEventDto } from './dto/updateEvent.dto';
 import { ObjectId } from 'mongodb';
+import nodemailer from 'nodemailer';
 
 @Injectable()
 export class EventService {
   constructor(
     @InjectModel(EventEntity.name) private eventModel: Model<EventEntity>,
   ) {}
-
   async createEvent(eventData: CreateEventDto, creatorEmail: string): Promise<EventEntity> {
-    eventData.creator = creatorEmail; // Set the creator's email
+    eventData.creator = creatorEmail;
     const createdEvent = new this.eventModel(eventData);
-    return createdEvent.save();
-  }
+    await createdEvent.save();
 
+    // Send email to participants
+    return createdEvent;
+  }
   async updateEvent(id: string, updateEventDto: UpdateEventDto, userEmail: string): Promise<EventEntity> {
     const event = await this.eventModel.findById(id).exec();
     if (!event) {
@@ -64,4 +66,5 @@ export class EventService {
   async findAll(): Promise<EventEntity[]> {
     return this.eventModel.find().exec();
   }
+
 }

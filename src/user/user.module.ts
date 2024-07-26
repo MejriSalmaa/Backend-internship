@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { UserService } from './user.service';
 import { UserEntity, UserEntitySchema } from './user.entity';
-
+import { UserController } from './user.controller';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: UserEntity.name, schema: UserEntitySchema }]),
@@ -14,6 +14,8 @@ import { UserEntity, UserEntitySchema } from './user.entity';
       signOptions: { expiresIn: '1d' },
     }),
   ],
+  controllers: [UserController],
+
   providers: [UserService],
   exports: [UserService, MongooseModule],
 })

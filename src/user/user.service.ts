@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {  Injectable , HttpException , HttpStatus} from '@nestjs/common';
+import {  Injectable , HttpException , HttpStatus,BadRequestException} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserEntity } from './user.entity';
 import { Model } from 'mongoose';
@@ -36,7 +36,20 @@ export class UserService {
     const objectId = new ObjectId(id);
     return await this.userModel.findOne({ _id: objectId }).exec();
   }
-  async findUserByEmail(email: string): Promise<UserEntity | null> {
-    return this.userModel.findOne({ email }).exec();
+  async findEmails(search: string): Promise<string[]> {
+    if (!search || typeof search !== 'string') {
+      throw new BadRequestException('Invalid search parameter');
+    }
+
+    const formattedSearch = search.trim().toLowerCase();
+    const regex = new RegExp(formattedSearch, 'i');
+
+    try {
+      const users = await this.userModel.find({ email: regex }).exec();
+      return users.map(user => user.email);
+    } catch (error) {
+      console.error('Error finding emails:', error);
+      throw new BadRequestException('Database query failed');
+    }
   }
 }
