@@ -8,6 +8,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { EventModule } from './event/event.module'; // Only import the module
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+
+import { NotificationModule } from './notification/notification.module';
 @Module({
   imports: [
     
@@ -17,7 +19,8 @@ import { ConfigModule } from '@nestjs/config';
     }),
     UserModule,
     EventModule,
-    AuthModule, // Keep module imports together
+    AuthModule,
+    NotificationModule, // Keep module imports together
   ],
   controllers: [AppController], // Only declare AppController here
   providers: [AppService], // Only declare AppService here

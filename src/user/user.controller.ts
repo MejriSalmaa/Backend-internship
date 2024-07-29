@@ -25,7 +25,6 @@ export class UserController {
   }
   @Get('emails/:search')
   async getEmailsByParam(@Param('search') search: string) {
-    console.log('Search parameter received:', search); // Log the search parameter
 
     if (!search) {
       throw new BadRequestException('Search parameter is required');
