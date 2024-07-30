@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, Post, Body, Request, UseGuards, Patch, Param, NotFoundException, Delete, Get, Put } from '@nestjs/common';
+import { Controller, Post, Body, Request, UseGuards, Patch, Param, NotFoundException, Delete, Get, Put ,Query} from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/createEvent.dto';
 import { UserService } from '../user/user.service';
@@ -59,5 +59,10 @@ export class EventController {
   @Get('categories')
   getCategories() {
     return Object.values(EventCategory);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Get('search')
+  async searchEvents(@Query('query') query: string) {
+    return this.eventService.searchEvents(query);
   }
 }

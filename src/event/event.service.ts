@@ -92,4 +92,15 @@ export class EventService {
   async findAll(): Promise<EventEntity[]> {
     return this.eventModel.find().exec();
   }
+
+  async searchEvents(query: string): Promise<EventEntity[]> {
+    const searchRegex = new RegExp(query, 'i'); // Case-insensitive search
+    return this.eventModel.find({
+      $or: [
+        { title: searchRegex },
+        { creator: searchRegex },
+        { category: searchRegex },
+      ],
+    }).exec();
+  }
 }
