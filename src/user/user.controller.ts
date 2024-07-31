@@ -1,8 +1,13 @@
-import { Controller, Get, Param, Query, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Param, Query, BadRequestException, NotFoundException,Body ,UseGuards,Put,Post,Delete} from '@nestjs/common';
 import { UserService } from './user.service';
 import { Types } from 'mongoose';
 import { UserEntity } from './user.entity';
-
+import {CreateUserDto} from './dto/CreateUserDto.dto';
+import {Role} from './role.enum';
+import {Roles} from './roles.decorator';
+import {RolesGuard} from './roles.guard';
+import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard';
+import { UpdateUserDto } from './dto/update-user.dto'; // Ensure this DTO exists
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -38,4 +43,42 @@ export class UserController {
       throw new BadRequestException('Failed to fetch emails');
     }
   }
+  @Post('create')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
+  async createUser(@Body() createUserDto: CreateUserDto) {
+    return this.userService.createUser(createUserDto);
+  }
+ @Get()
+ async getAllUsers() {
+   return this.userService.findAll();
+ }
+
+
+ @Put(':id')
+ @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin) // Ensure this matches the role decorator for admin
+ async updateUser(
+   @Param('id') id: string,
+   @Body() updateUserDto: UpdateUserDto
+ ): Promise<UserEntity> {
+   try {
+     return await this.userService.updateUser(id, updateUserDto);
+   } catch (error) {
+     throw new Error(`Failed to update user: ${error.message}`);
+   }
+ }
+
+
+ @Delete(':id')
+ @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin) // Ensure this matches the role decorator for admin
+  async removeUser(@Param('id') id: string): Promise<void> {
+    try {
+      await this.userService.removeUser(id);
+    } catch (error) {
+      throw new Error(`Failed to remove user: ${error.message}`);
+    }
+  }
+
 }
