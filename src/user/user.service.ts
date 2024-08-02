@@ -12,6 +12,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CreateUserDto } from './dto/CreateUserDto.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateProfileDto } from './dto/UpdateProfileDto.dto';
+
 @Injectable()
 export class UserService {
   constructor(
@@ -126,4 +128,36 @@ export class UserService {
     // Delete the user
     await this.userModel.deleteOne({ _id: id }).exec();
   }
+
+  async getProfile(email: string): Promise<UserEntity> {
+    const user = await this.userModel.findOne({ email }).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async updateProfile(email: string, updateProfileDto: UpdateProfileDto): Promise<UserEntity> {
+    // Check if password needs to be hashed
+    if (updateProfileDto.password) {
+      updateProfileDto.password = await bcrypt.hash(updateProfileDto.password, 10);
+    }
+  
+    const user = await this.userModel.findOneAndUpdate(
+      { email },
+      {
+        username: updateProfileDto.username,
+        picture: updateProfileDto.picture,
+        password: updateProfileDto.password,
+      },
+      { new: true }
+    ).exec();
+  
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+  
+    return user;
+  }
+
 }

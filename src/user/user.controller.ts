@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, BadRequestException, NotFoundException,Body ,UseGuards,Put,Post,Delete} from '@nestjs/common';
+import { Controller, Get, Param, Query, BadRequestException, NotFoundException,Body ,UseGuards,Put,Post,Delete,Request} from '@nestjs/common';
 import { UserService } from './user.service';
 import { Types } from 'mongoose';
 import { UserEntity } from './user.entity';
@@ -8,6 +8,7 @@ import {Roles} from './roles.decorator';
 import {RolesGuard} from './roles.guard';
 import {JwtAuthGuard} from '../auth/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto'; // Ensure this DTO exists
+import { UpdateProfileDto } from './dto/UpdateProfileDto.dto'; // Ensure this DTO exists
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -80,5 +81,22 @@ export class UserController {
       throw new Error(`Failed to remove user: ${error.message}`);
     }
   }
-
+  @Get('profile/me')
+@UseGuards(JwtAuthGuard)
+async getProfile(@Request() req) {
+  try {
+    const profile = await this.userService.getProfile(req.user.email);
+    // Debugging: log the profile data
+    console.log('Profile fetched:', profile);
+    return profile;
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    throw new BadRequestException('Failed to fetch profile');
+  }
+}
+  @Put('profile/update')
+  @UseGuards(JwtAuthGuard)
+  updateProfile(@Request() req, @Body() updateProfileDto: UpdateProfileDto) {
+    return this.userService.updateProfile(req.user.email, updateProfileDto);
+  }
 }

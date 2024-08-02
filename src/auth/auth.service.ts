@@ -66,7 +66,7 @@ export class AuthService {
       throw new HttpException('Incorrect password', HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
-    const payload = { email: user.email, sub: user._id , role: user.role };
+    const payload = { email: user.email, sub: user._id , role: user.role, username: user.username, picture: user.picture};
     const token = this.jwtService.sign(payload);
 
     return {
