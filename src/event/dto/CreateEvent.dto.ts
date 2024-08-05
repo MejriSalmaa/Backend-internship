@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { IsString, IsNotEmpty, IsEnum, IsDate, IsArray, IsEmail,IsDateString } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsNotEmpty, IsEnum, IsArray, IsEmail,IsDateString } from 'class-validator';
 
 export enum EventCategory {
   Anniversaire = 'Anniversaire',

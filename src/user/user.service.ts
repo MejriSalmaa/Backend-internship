@@ -138,25 +138,24 @@ export class UserService {
   }
 
   async updateProfile(email: string, updateProfileDto: UpdateProfileDto): Promise<UserEntity> {
-    // Check if password needs to be hashed
+    // Check if the updateProfileDto contains a new password
     if (updateProfileDto.password) {
-      updateProfileDto.password = await bcrypt.hash(updateProfileDto.password, 10);
+      // Hash the new password
+      const salt = await bcrypt.genSalt(10);
+      updateProfileDto.password = await bcrypt.hash(updateProfileDto.password, salt);
+    } else {
+      // Remove password from updateProfileDto to avoid overwriting with undefined
+      delete updateProfileDto.password;
     }
-  
-    const user = await this.userModel.findOneAndUpdate(
-      { email },
-      {
-        username: updateProfileDto.username,
-        picture: updateProfileDto.picture,
-        password: updateProfileDto.password,
-      },
-      { new: true }
-    ).exec();
-  
+
+    const user = await this.userModel.findOneAndUpdate({ email }, updateProfileDto, {
+      new: true,
+    });
+
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(`User with email ${email} not found`);
     }
-  
+
     return user;
   }
 

@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional, IsUrl } from "class-validator";
+import { IsBoolean, IsEmail, IsEnum, IsNotEmpty, IsOptional } from "class-validator";
 import { ApiProperty } from '@nestjs/swagger'; // Ensure this is installed
 
 enum Role {

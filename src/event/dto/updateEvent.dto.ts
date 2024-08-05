@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { IsString, IsOptional, IsEnum, IsDate, IsArray, IsEmail ,IsDateString} from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsOptional, IsEnum, IsArray, IsEmail ,IsDateString} from 'class-validator';
 import { EventCategory } from './createEvent.dto';
 
 export class UpdateEventDto {

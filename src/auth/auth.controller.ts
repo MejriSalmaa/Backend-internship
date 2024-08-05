@@ -20,20 +20,28 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  @UseInterceptors(FileInterceptor('picture', {
-    storage: multer.memoryStorage(), // Store file in memory
-  }))
-  async register(@Body() registerDto: RegisterDto, @UploadedFile() file: Express.Multer.File) {
-    try {
-      if (file) {
-        registerDto.picture = file; // File buffer is now available
-      }
-      return await this.authService.register(registerDto);
-    } catch (error) {
-      console.error('Error in AuthController.register:', error);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+@UseInterceptors(
+  FileInterceptor('picture', {
+    storage: diskStorage({
+      destination: './uploads', // Ensure this directory exists
+      filename: (req, file, callback) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        const fileExtName = extname(file.originalname);
+        const fileName = `${uniqueSuffix}${fileExtName}`;
+        callback(null, fileName);
+      },
+    }),
+  }),
+)
+async register(@Body() registerDto: RegisterDto, @UploadedFile() file: Express.Multer.File) {
+  try {
+    return await this.authService.register(registerDto, file);
+  } catch (error) {
+    console.error('Error in AuthController.register:', error);
+    throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
   }
+}
+
   @Post('login')
   async login(@Body() loginDto: LoginDto): Promise<any> {
     try {
