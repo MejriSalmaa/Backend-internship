@@ -3,6 +3,10 @@ import { NotificationService } from './notification.service'; // Adjust the path
 import { CreateNotificationDTO } from './dto/Notification.dto'; // Adjust the path as necessary
 import { Notification } from './notification.entity'; // Adjust the path as necessary
 import { EventEntity } from 'src/event/event.entity';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiParam, ApiConsumes } from '@nestjs/swagger';
+
+@ApiTags('notifications')
+
 @Controller('notifications')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
@@ -33,5 +37,10 @@ export class NotificationController {
     @Body('userEmail') userEmail: string,
   ): Promise<EventEntity> {
     return this.notificationService.removeParticipantFromEvent(eventId, userEmail);
+  }
+
+  @Patch('mark-all-read')
+  async markAllAsRead(@Query('userEmail') userEmail: string): Promise<void> {
+    return this.notificationService.markAllNotificationsAsRead(userEmail);
   }
 }

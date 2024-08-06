@@ -10,13 +10,13 @@ import { compare } from 'bcrypt';
 import { UserEntity } from '../user/user.entity';
 import * as fs from 'fs';
 import * as path from 'path';
-
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(UserEntity.name) private userModel: Model<UserEntity>,
     private readonly userService: UserService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,   
+
   ) {}
 
   async register(registerDto: RegisterDto, file?: Express.Multer.File): Promise<UserEntity> {
@@ -80,5 +80,7 @@ export class AuthService {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+
 
 }

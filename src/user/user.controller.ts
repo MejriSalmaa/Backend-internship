@@ -28,6 +28,9 @@ import { UpdateProfileDto } from './dto/UpdateProfileDto.dto'; // Ensure this DT
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiParam, ApiConsumes } from '@nestjs/swagger';
+
+@ApiTags('users')
 
 @Controller('users')
 export class UserController {
@@ -68,6 +71,8 @@ export class UserController {
   @Post('create')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin)
+  @ApiBearerAuth()
+
   async createUser(@Body() createUserDto: CreateUserDto) {
     return this.userService.createUser(createUserDto);
   }
@@ -80,6 +85,8 @@ export class UserController {
   @Put(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin) // Ensure this matches the role decorator for admin
+  @ApiBearerAuth()
+
   async updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -94,6 +101,8 @@ export class UserController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.Admin) // Ensure this matches the role decorator for admin
+  @ApiBearerAuth()
+
   async removeUser(@Param('id') id: string): Promise<void> {
     try {
       await this.userService.removeUser(id);
@@ -104,6 +113,8 @@ export class UserController {
 
   @Get('profile/me')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+
   async getProfile(@Request() req) {
     try {
       const profile = await this.userService.getProfile(req.user.email);
@@ -118,6 +129,8 @@ export class UserController {
 
   @Put('profile/update')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+
   @UseInterceptors(
     FileInterceptor('profilePicture', {
       storage: diskStorage({

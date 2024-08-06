@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, Post, Body, Request, UseGuards, Patch, Param, NotFoundException, Delete, Get, Put ,Query} from '@nestjs/common';
+import { Controller, Post, Body, Request, UseGuards, Patch, Param, NotFoundException, Delete, Get, Put, Query } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto } from './dto/createEvent.dto';
 import { UserService } from '../user/user.service';
@@ -10,6 +10,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { UpdateEventDto } from './dto/updateEvent.dto';
 import { EventEntity } from './event.entity';
 import { EventCategory } from './EventCategory.enum';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiParam, ApiConsumes } from '@nestjs/swagger';
+
+@ApiTags('events')
 @Controller('events')
 export class EventController {
   constructor(
@@ -18,6 +21,7 @@ export class EventController {
   ) { }
   @Post('/create')
   @UseGuards(JwtAuthGuard) // Ensure the user is logged in
+  @ApiBearerAuth()
 
   async create(@Body() createEventDto: CreateEventDto, @Request() req) {
     // Assuming the user's email is stored in req.user.email
@@ -27,6 +31,8 @@ export class EventController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+
   @Put('/update/:id')
   async update(
     @Param('id') id: string,
@@ -44,6 +50,8 @@ export class EventController {
   }
   @Delete('/delete/:id')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+
   async remove(@Param('id') id: string, @Request() req): Promise<{ deleted: boolean }> {
     const userEmail = req.user.email;
 
@@ -53,6 +61,7 @@ export class EventController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async findAll(): Promise<EventEntity[]> {
     return this.eventService.findAll();
   }
@@ -61,7 +70,10 @@ export class EventController {
     return Object.values(EventCategory);
   }
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+
   @Get('search')
+
   async searchEvents(@Query('query') query: string) {
     return this.eventService.searchEvents(query);
   }

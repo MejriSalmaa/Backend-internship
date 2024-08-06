@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 
-import { Controller, Post, Body, HttpException, HttpStatus, Request ,UseGuards , Get , UseInterceptors,Res} from '@nestjs/common';
+import { Controller, Post, Body, HttpException, HttpStatus, Request ,UseGuards , Get , UseInterceptors,Res,Query} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -11,8 +11,10 @@ import { diskStorage } from 'multer';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadedFile } from '@nestjs/common';
 import { Response } from 'express';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery } from '@nestjs/swagger';
 
 import * as multer from 'multer';
+@ApiTags('auth')
 
 
 @Controller('auth')
@@ -51,17 +53,23 @@ async register(@Body() registerDto: RegisterDto, @UploadedFile() file: Express.M
     }
   }
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+
   @Post('protected')
   async protectedRoute(@Request() req) {
     return { message: 'You have access to this protected route', user: req.user };
   }
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+
   @Get('profile')
   async getProfile(@Request() req) {
     const userId = req.user.sub; // Assuming `sub` is the user ID in the JWT payload
     return this.authService.getProfile(userId);
   }
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+
   @Post('logout')
   async logout(@Res({passthrough: true}) response: Response) {
 
@@ -70,4 +78,6 @@ async register(@Body() registerDto: RegisterDto, @UploadedFile() file: Express.M
           message: 'success logout'
       }
 }
+
+
 }

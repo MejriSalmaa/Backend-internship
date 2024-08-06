@@ -9,7 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express'; // Import MulterModule
 
-import { NotificationModule } from './notification/notification.module';
+
 @Module({
   imports: [
     
@@ -23,7 +23,7 @@ import { NotificationModule } from './notification/notification.module';
     UserModule,
     EventModule,
     AuthModule,
-    NotificationModule, // Keep module imports together
+   
   ],
   controllers: [AppController], // Only declare AppController here
   providers: [AppService], // Only declare AppService here

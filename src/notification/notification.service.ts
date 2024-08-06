@@ -41,4 +41,10 @@ export class NotificationService {
     eventEntity.participants = eventEntity.participants.filter(participant => participant !== userEmail);
     return eventEntity.save();
   }
+  async markAllNotificationsAsRead(userEmail: string): Promise<void> {
+    await this.notificationModel.updateMany(
+      { user: userEmail, isRead: false },
+      { $set: { isRead: true } }
+    ).exec();
+  }
 }

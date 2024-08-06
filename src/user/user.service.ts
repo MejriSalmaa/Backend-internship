@@ -38,6 +38,9 @@ export class UserService {
 
     return { token };
   }
+  async findByEmail(email: string): Promise<UserEntity | undefined> {
+    return this.userModel.findOne({ email });
+  }
 
   async findUserById(id: string): Promise<UserEntity | undefined> {
     const objectId = new ObjectId(id);
@@ -158,5 +161,7 @@ export class UserService {
 
     return user;
   }
-
+  async updatePassword(userId: number, newPassword: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, { password: newPassword });
+  }
 }
