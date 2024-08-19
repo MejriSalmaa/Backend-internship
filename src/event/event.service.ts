@@ -103,4 +103,17 @@ export class EventService {
       ],
     }).exec();
   }
+
+  async getPastEventsForParticipant(participantEmail: string): Promise<EventEntity[]> {
+    const currentDate = new Date();
+
+    return this.eventModel
+      .find({
+        participants: participantEmail,
+        endDate: { $lt: currentDate },
+      })
+      .lean() // This converts the Mongoose documents to plain JavaScript objects
+      .exec();
+  }
+
 }

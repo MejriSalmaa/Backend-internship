@@ -77,4 +77,13 @@ export class EventController {
   async searchEvents(@Query('query') query: string) {
     return this.eventService.searchEvents(query);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+
+  @Get('past-participated')
+  async getPastParticipatedEvents(@Request() req) {
+    const userEmail = req.user.email; // Assuming JWT payload contains email
+    return await this.eventService.getPastEventsForParticipant(userEmail);
+  }
 }

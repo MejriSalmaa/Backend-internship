@@ -43,4 +43,6 @@ export class NotificationController {
   async markAllAsRead(@Query('userEmail') userEmail: string): Promise<void> {
     return this.notificationService.markAllNotificationsAsRead(userEmail);
   }
+
+ 
 }
